@@ -2,27 +2,39 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Middleware to parse request bodies
-app.use(bodyParser.urlencoded({ extended: true }));
+// Sample user data (replace with your authentication logic)
+const users = [
+    { username: 'user1', password: 'password1' },
+    { username: 'user2', password: 'password2' }
+];
 
-// Serve static files (like HTML, CSS, etc.)
-app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-// Login route
+// Serve login page
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
+// Handle login form submission
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
+    const user = users.find(u => u.username === username && u.password === password);
 
-    // Simple validation
-    if (username === 'user' && password === 'password') {
+    if (user) {
+        // Successful login
+        res.set('Username', username);
+        res.set('Password', password);
         res.send('Login successful!');
     } else {
-        res.status(401).send('Invalid username or password');
+        // Unsuccessful login
+        res.status(401).send('Login failed. Invalid username or password.');
     }
 });
 
 // Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is listening at http://localhost:${port}`);
 });
